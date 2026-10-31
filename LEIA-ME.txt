@@ -1,0 +1,12 @@
+ARQUIVO 09 — PWA ATUALIZADA
+
+1. Publique TODOS os arquivos desta pasta na mesma pasta do seu site, em HTTPS.
+2. Abra o endereço uma vez com internet para o Service Worker armazenar a aplicação.
+3. Instale pelo menu do navegador / "Adicionar à tela inicial". A abertura instalada usa modo standalone, sem a barra de endereço do navegador.
+4. Na primeira abertura, crie uma senha com pelo menos 4 caracteres. Nas próximas aberturas, ela será solicitada.
+5. O conteúdo já salvo no aparelho continua disponível sem internet. A sincronização entre aparelhos por PeerJS exige internet.
+
+IMPORTANTE:
+- Uma página aberta em uma aba comum não pode esconder à força a barra do navegador. Para ficar com aparência de app, é necessário instalar a PWA ou empacotar o site em APK com modo imersivo.
+- A senha é local neste dispositivo e protege a interface; não substitui autenticação de servidor nem criptografia dos dados.
+- Para trocar ou redefinir a senha, apague a chave "arquivo09-pin-sha256" do armazenamento local do site. Isso não apaga os dados da investigação.

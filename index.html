@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="pt-BR">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#17120f">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta name="theme-color" content="#17120f"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="application-name" content="Arquivo 09"><link rel="apple-touch-icon" href="./icon-192.svg">
 <meta name="description" content="Arquivo 09 — Sala de Investigação, com funcionamento local e modo offline.">
 <link rel="manifest" href="./manifest.webmanifest">
 <title>Arquivo 09 — Sala de Investigação</title>
@@ -210,16 +210,77 @@ header{box-shadow:0 5px 18px #0005}
 
 </style><style>
 #installApp{display:inline-flex;align-items:center;gap:6px}
-#offlineStatus{position:fixed;bottom:10px;left:10px;z-index:1000;background:#241b15;color:#e7d8b5;border:1px solid #594431;border-radius:6px;padding:7px 10px;font:12px Arial,sans-serif;box-shadow:0 2px 8px #0005}
+#offlineStatus{display:none!important;position:fixed;bottom:10px;left:10px;z-index:1000;background:#241b15;color:#e7d8b5;border:1px solid #594431;border-radius:6px;padding:7px 10px;font:12px Arial,sans-serif;box-shadow:0 2px 8px #0005}
 #offlineStatus[data-state="offline"]{border-color:#b56a45}
+
+/* ===== Experiência de aplicativo instalado ===== */
+html{height:100%;width:100%;overscroll-behavior:none;-webkit-text-size-adjust:100%;touch-action:pan-y}
+body{height:100%;min-height:100%;width:100%;overflow-x:hidden;overscroll-behavior:none;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
+button,input,textarea,select{-webkit-tap-highlight-color:transparent}
+#workspace{touch-action:none;overscroll-behavior:contain}
+#boardScreen{height:100dvh;min-height:100dvh}
+#appGate{position:fixed;inset:0;z-index:10000;display:grid;place-items:center;padding:24px;background:radial-gradient(ellipse at 50% 35%,#3c2a1b,#100c09 72%);color:#eadfc9}
+.gate-card{width:min(390px,100%);padding:30px 25px;border:1px solid #806044;border-radius:16px;background:linear-gradient(155deg,#2b2018,#17110d);box-shadow:0 25px 90px #000b;text-align:center}
+.gate-mark{width:72px;height:72px;margin:0 auto 18px;display:grid;place-items:center;border:1px solid #b58a55;border-radius:18px;color:#e0bd7b;font:28px Georgia,serif;box-shadow:inset 0 0 25px #c49a5722,0 0 35px #c49a571c}
+.gate-kicker{font:10px Arial,sans-serif;letter-spacing:4px;color:#b58a55}
+.gate-card h1{font:normal 29px Georgia,serif;margin:9px 0 7px;color:#ead9b9}
+.gate-card p{font:13px/1.5 Arial,sans-serif;color:#b8a991;margin:0 0 20px}
+.gate-card input{height:48px;text-align:center;font:20px Arial,sans-serif;letter-spacing:7px;border-radius:8px}
+.gate-card button{width:100%;margin-top:12px;min-height:46px}
+.gate-error{min-height:18px;margin-top:10px!important;color:#df8877!important}
+#splash{position:fixed;inset:0;z-index:11000;display:grid;place-items:center;background:radial-gradient(ellipse at 50% 40%,#3c2a1b,#100c09 72%);transition:opacity .55s ease,visibility .55s ease}
+#splash.done{opacity:0;visibility:hidden;pointer-events:none}
+.splash-inner{text-align:center;animation:splashRise .8s cubic-bezier(.2,.8,.2,1) both}
+.splash-logo{width:88px;height:88px;margin:0 auto 20px;border:1px solid #b58a55;border-radius:22px;display:grid;place-items:center;color:#e0bd7b;font:34px Georgia,serif;box-shadow:0 0 45px #c49a5733,inset 0 0 24px #c49a5722;animation:logoPulse 1.8s ease-in-out infinite}
+.splash-name{font:11px Arial,sans-serif;letter-spacing:5px;color:#e7d8b5}
+.splash-sub{margin-top:9px;font:10px Arial,sans-serif;letter-spacing:2px;color:#9f8768}
+.splash-loader{width:150px;height:2px;margin:25px auto 0;background:#594431;overflow:hidden}
+.splash-loader:after{content:"";display:block;width:45%;height:100%;background:#e0bd7b;animation:loadSweep 1.1s ease-in-out infinite}
+@keyframes loadSweep{from{transform:translateX(-110%)}to{transform:translateX(330%)}}
+@keyframes logoPulse{50%{box-shadow:0 0 65px #c49a5755,inset 0 0 32px #c49a5733;transform:translateY(-3px)}}
+@keyframes splashRise{from{opacity:0;transform:translateY(14px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+
 </style></head>
 <body>
+<div id="splash" aria-label="Carregando Arquivo 09"><div class="splash-inner"><div class="splash-logo">09</div><div class="splash-name">ARQUIVO 09</div><div class="splash-sub">SALA DE INVESTIGAÇÃO</div><div class="splash-loader"></div></div></div>
+<section id="appGate" class="hidden" aria-modal="true" role="dialog" aria-labelledby="gateTitle"><div class="gate-card"><div class="gate-mark">09</div><div class="gate-kicker">ACESSO RESTRITO</div><h1 id="gateTitle">Sala de Investigação</h1><p id="gateDescription">Digite sua senha para acessar seus arquivos.</p><form id="gateForm"><input id="gatePin" type="password" inputmode="numeric" autocomplete="current-password" minlength="4" maxlength="32" placeholder="••••" aria-label="Senha" required><button class="primary" id="gateSubmit" type="submit">Desbloquear</button></form><p class="gate-error" id="gateError" aria-live="polite"></p></div></section>
 <header><div class="brand">ARQUIVO 09 · INVESTIGAÇÕES</div><div class="actions"><button id="syncOpen">⇄ Conectar dispositivos</button><button id="backupOut">↓ Backup</button><button id="backupIn">↑ Restaurar</button></div></header>
 <main id="home"><section class="hero"><div class="eyebrow">Departamento de investigação · Acesso restrito</div><h1>Todo detalhe deixa um rastro.</h1><p>Organize pessoas, evidências, documentos e hipóteses. Cada pessoa possui seu próprio quadro de investigação.</p></section><div class="toolbar"><h2>Pessoas em investigação</h2><button class="primary" id="newPerson">＋ Nova pessoa / caso</button></div><div id="people" class="grid"></div><p class="hint">ARQUIVO LOCAL · Os dados ficam neste navegador. Faça backups regularmente.</p></main>
 <section id="boardScreen" class="hidden"><div class="boardhead"><button id="back">← Voltar</button><div class="boardtitle"><img id="boardPersonPhoto" class="board-person-photo hidden" alt="Foto da pessoa"><div class="board-person-name"><strong id="personName"></strong><small id="personMeta"></small></div></div><div class="tools"><span class="hint">QUADRO ATIVO</span></div></div><div class="layout"><aside class="side left"><div id="personSheet" class="personsheet"></div><h3>Adicionar ao quadro</h3><button id="addNote">▤ Post-it / anotação</button><button id="addEvidence">⌕ Evidência / pista</button><button id="addPhoto">▧ Fotografia</button><button id="addDoc">▤ Documento</button><button id="addHyp">✧ Hipótese</button><p class="hint">Arraste cartões livremente. Para ligar dois itens, ative “Conectar pistas” e clique nos cartões. O quadro é fixo: use o zoom (roda do mouse, + − ou pinça) para navegar. Toque duas vezes em um cartão para editar.</p><h3>Perfil</h3><button id="editPerson">✎ Editar pessoa</button><button id="timelineAdd">◷ Registrar acontecimento</button><button id="caseExport">↓ Exportar caso</button><button id="snap2">📷 Fotografar quadro</button></aside><div class="workspace" id="workspace"><button class="room-toggle" id="leftToggle" title="Mostrar ferramentas">☰</button><button class="room-toggle" id="rightToggle" title="Mostrar registros">▤</button><div class="room-tools"><button id="minus" class="minor-tool" title="Afastar">−</button><button id="plus" class="minor-tool" title="Aproximar">＋</button><button id="fit" title="Enquadrar">⌗</button><button id="connectMode" title="Conectar pistas">⌁</button><button id="save" title="Salvar">✓</button><button id="snap" title="Fotografar o quadro inteiro">📷</button></div><div class="room-caption">Painel de evidências · Arquivo 09</div><div class="desk-prop one">ARQUIVO<br>CONFIDENCIAL</div><div class="desk-prop two">EVIDÊNCIA<br>RESTRITA</div><div class="desk-prop three">NOTAS</div><div id="board"><svg id="strings"></svg></div></div><aside class="side right"><h3>Registro da investigação</h3><div id="stats" class="hint"></div><h3>Linha do tempo</h3><div id="timeline"></div><button id="timelineAdd2">＋ Acontecimento</button><h3>Notas gerais</h3><textarea id="generalNotes" placeholder="Anotações desta investigação..."></textarea><button id="notesSave">Salvar notas</button><h3>Conexões</h3><div id="links"></div></aside></div></section>
 <div id="modalRoot"></div><div id="toastRoot"></div>
 <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
 <script>
+
+/* ===== Senha local: primeiro acesso cria o PIN; próximas aberturas pedem desbloqueio ===== */
+const PIN_KEY='arquivo09-pin-sha256';
+async function pinDigest(value){
+ const bytes=new TextEncoder().encode(value);
+ const digest=await crypto.subtle.digest('SHA-256',bytes);
+ return [...new Uint8Array(digest)].map(x=>x.toString(16).padStart(2,'0')).join('');
+}
+async function showAccessGate(){
+ const gate=$('appGate'),form=$('gateForm'),pin=$('gatePin'),desc=$('gateDescription'),submit=$('gateSubmit'),err=$('gateError');
+ const hasPin=!!localStorage.getItem(PIN_KEY);
+ desc.textContent=hasPin?'Digite sua senha para acessar seus arquivos.':'Crie uma senha de acesso (mínimo de 4 caracteres). Ela será solicitada nas próximas aberturas.';
+ submit.textContent=hasPin?'Desbloquear':'Criar senha';
+ pin.autocomplete=hasPin?'current-password':'new-password';
+ gate.classList.remove('hidden');
+ setTimeout(()=>pin.focus(),100);
+ form.onsubmit=async ev=>{
+  ev.preventDefault();const value=pin.value;
+  if(value.length<4){err.textContent='Use pelo menos 4 caracteres.';return}
+  submit.disabled=true;err.textContent='';
+  try{
+   const digest=await pinDigest(value),saved=localStorage.getItem(PIN_KEY);
+   if(!saved){localStorage.setItem(PIN_KEY,digest);gate.classList.add('hidden');}
+   else if(digest===saved){gate.classList.add('hidden');}
+   else{err.textContent='Senha incorreta. Tente novamente.';pin.value='';pin.focus();}
+  }catch(e){err.textContent='Não foi possível validar a senha neste dispositivo.'}
+  finally{submit.disabled=false}
+ };
+}
+
 const DB='arquivo09-db',STORE='dados';let state={people:[],deleted:{people:[],items:[],lines:[]}},current=null,zoom=.6,drag=null,selected=null,linkMode=false,firstLink=null,peer=null,connection=null,chunks={},syncTimer=null,syncingRemote=false,remoteDeviceName='',localDeviceName=getDeviceName();
 const $=id=>document.getElementById(id);
 function getDeviceName(){let ua=navigator.userAgent||'',os=/Android/i.test(ua)?'Android':/iPhone|iPad/i.test(ua)?'iPhone/iPad':/Windows/i.test(ua)?'Windows':/Mac OS/i.test(ua)?'Mac':/Linux/i.test(ua)?'Linux':'Navegador';let browser=/Edg\//.test(ua)?'Edge':/OPR\//.test(ua)?'Opera':/Chrome\//.test(ua)?'Chrome':/Firefox\//.test(ua)?'Firefox':/Safari\//.test(ua)?'Safari':'Navegador';return os+' · '+browser}
@@ -699,11 +760,21 @@ document.addEventListener('keydown',e=>{
  placeItem(it,it.x+d[0],it.y+d[1]);it.updatedAt=Date.now();drawLines();
  clearTimeout(nudgeTimer);nudgeTimer=setTimeout(()=>save(),400);
 });
+
+/* Bloqueia zoom global; a ampliação do quadro continua disponível dentro de #workspace. */
+document.addEventListener('wheel',e=>{if((e.ctrlKey||e.metaKey)&&!e.target.closest('#workspace'))e.preventDefault()},{passive:false});
+document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&['+','=','-','0'].includes(e.key)){e.preventDefault()}});
+document.addEventListener('gesturestart',e=>{if(!e.target.closest('#workspace'))e.preventDefault()},{passive:false});
+
 /* garante o salvamento se a aba for fechada/escondida logo após uma alteração */
 document.addEventListener('visibilitychange',()=>{if(document.hidden&&state.people.length)save()});
-(async()=>{state=await load();setPersonFavicon(null);renderHome()})();
+(async()=>{
+ try{state=await load();setPersonFavicon(null);renderHome();await showAccessGate();}
+ catch(e){console.error(e);toast('Não foi possível abrir os dados locais.');await showAccessGate();}
+ setTimeout(()=>$('splash').classList.add('done'),900);
+})();
 </script> 
-<div id="offlineStatus" role="status" aria-live="polite">Preparando modo offline…</div>
+<div id="offlineStatus" role="status" aria-live="polite" class="hidden">Preparando modo offline…</div>
 <script>
 (()=>{
  const status=document.getElementById('offlineStatus');

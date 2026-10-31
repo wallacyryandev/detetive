@@ -2,6 +2,8 @@
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#17120f">
+<meta name="description" content="Arquivo 09 — Sala de Investigação, com funcionamento local e modo offline.">
+<link rel="manifest" href="./manifest.webmanifest">
 <title>Arquivo 09 — Sala de Investigação</title>
 <link id="dynamicFavicon" rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='10' fill='%2317120f'/%3E%3Ctext x='32' y='45' font-size='43' text-anchor='middle' fill='%23c49a57' font-family='Georgia'%3E09%3C/text%3E%3C/svg%3E">
 <style>
@@ -206,9 +208,13 @@ header{box-shadow:0 5px 18px #0005}
 .preview-content .preview-date{font:12px Arial,sans-serif;color:#6b543b;margin-top:16px}
 .preview-image{display:block;max-width:100%;max-height:72vh;width:auto;height:auto;object-fit:contain;margin:0 auto;background:#100d0a}
 
+</style><style>
+#installApp{display:inline-flex;align-items:center;gap:6px}
+#offlineStatus{position:fixed;bottom:10px;left:10px;z-index:1000;background:#241b15;color:#e7d8b5;border:1px solid #594431;border-radius:6px;padding:7px 10px;font:12px Arial,sans-serif;box-shadow:0 2px 8px #0005}
+#offlineStatus[data-state="offline"]{border-color:#b56a45}
 </style></head>
 <body>
-<header><div class="brand">ARQUIVO 09 · INVESTIGAÇÕES</div><div class="actions"><button id="syncOpen">⇄ Conectar dispositivos</button><button id="backupOut">↓ Backup</button><button id="backupIn">↑ Restaurar</button></div></header>
+<header><div class="brand">ARQUIVO 09 · INVESTIGAÇÕES</div><div class="actions"><button id="syncOpen">⇄ Conectar dispositivos</button><button id="backupOut">↓ Backup</button><button id="backupIn">↑ Restaurar</button><button id="installApp" type="button">⇩ Instalar app</button></div></header>
 <main id="home"><section class="hero"><div class="eyebrow">Departamento de investigação · Acesso restrito</div><h1>Todo detalhe deixa um rastro.</h1><p>Organize pessoas, evidências, documentos e hipóteses. Cada pessoa possui seu próprio quadro de investigação.</p></section><div class="toolbar"><h2>Pessoas em investigação</h2><button class="primary" id="newPerson">＋ Nova pessoa / caso</button></div><div id="people" class="grid"></div><p class="hint">ARQUIVO LOCAL · Os dados ficam neste navegador. Faça backups regularmente.</p></main>
 <section id="boardScreen" class="hidden"><div class="boardhead"><button id="back">← Voltar</button><div class="boardtitle"><img id="boardPersonPhoto" class="board-person-photo hidden" alt="Foto da pessoa"><div class="board-person-name"><strong id="personName"></strong><small id="personMeta"></small></div></div><div class="tools"><span class="hint">QUADRO ATIVO</span></div></div><div class="layout"><aside class="side left"><div id="personSheet" class="personsheet"></div><h3>Adicionar ao quadro</h3><button id="addNote">▤ Post-it / anotação</button><button id="addEvidence">⌕ Evidência / pista</button><button id="addPhoto">▧ Fotografia</button><button id="addDoc">▤ Documento</button><button id="addHyp">✧ Hipótese</button><p class="hint">Arraste cartões livremente. Para ligar dois itens, ative “Conectar pistas” e clique nos cartões. O quadro é fixo: use o zoom (roda do mouse, + − ou pinça) para navegar. Toque duas vezes em um cartão para editar.</p><h3>Perfil</h3><button id="editPerson">✎ Editar pessoa</button><button id="timelineAdd">◷ Registrar acontecimento</button><button id="caseExport">↓ Exportar caso</button><button id="snap2">📷 Fotografar quadro</button></aside><div class="workspace" id="workspace"><button class="room-toggle" id="leftToggle" title="Mostrar ferramentas">☰</button><button class="room-toggle" id="rightToggle" title="Mostrar registros">▤</button><div class="room-tools"><button id="minus" class="minor-tool" title="Afastar">−</button><button id="plus" class="minor-tool" title="Aproximar">＋</button><button id="fit" title="Enquadrar">⌗</button><button id="connectMode" title="Conectar pistas">⌁</button><button id="save" title="Salvar">✓</button><button id="snap" title="Fotografar o quadro inteiro">📷</button></div><div class="room-caption">Painel de evidências · Arquivo 09</div><div class="desk-prop one">ARQUIVO<br>CONFIDENCIAL</div><div class="desk-prop two">EVIDÊNCIA<br>RESTRITA</div><div class="desk-prop three">NOTAS</div><div id="board"><svg id="strings"></svg></div></div><aside class="side right"><h3>Registro da investigação</h3><div id="stats" class="hint"></div><h3>Linha do tempo</h3><div id="timeline"></div><button id="timelineAdd2">＋ Acontecimento</button><h3>Notas gerais</h3><textarea id="generalNotes" placeholder="Anotações desta investigação..."></textarea><button id="notesSave">Salvar notas</button><h3>Conexões</h3><div id="links"></div></aside></div></section>
 <div id="modalRoot"></div><div id="toastRoot"></div>
@@ -696,4 +702,56 @@ document.addEventListener('keydown',e=>{
 /* garante o salvamento se a aba for fechada/escondida logo após uma alteração */
 document.addEventListener('visibilitychange',()=>{if(document.hidden&&state.people.length)save()});
 (async()=>{state=await load();setPersonFavicon(null);renderHome()})();
-</script></body></html>
+</script> 
+<div id="offlineStatus" role="status" aria-live="polite">Preparando modo offline…</div>
+<script>
+(()=>{
+ const installBtn=document.getElementById('installApp');
+ const status=document.getElementById('offlineStatus');
+ let installPrompt=null;
+ function onlineState(){
+   status.dataset.state=navigator.onLine?'online':'offline';
+   status.textContent=navigator.onLine?'Modo local disponível':'Sem internet · Arquivo local disponível';
+ }
+ window.addEventListener('online',onlineState);
+ window.addEventListener('offline',onlineState);
+ onlineState();
+ window.addEventListener('beforeinstallprompt',e=>{
+   e.preventDefault(); installPrompt=e;
+   installBtn.textContent='⇩ Instalar app';
+   installBtn.disabled=false;
+ });
+ window.addEventListener('appinstalled',()=>{
+   installPrompt=null;installBtn.textContent='✓ App instalado';
+   status.textContent='App instalado · Pode abrir sem internet após o primeiro carregamento';
+ });
+ installBtn.addEventListener('click',async()=>{
+   if(installPrompt){
+     installPrompt.prompt();
+     const choice=await installPrompt.userChoice;
+     if(choice && choice.outcome==='accepted') installBtn.textContent='Instalando…';
+     installPrompt=null;
+     return;
+   }
+   if(!('serviceWorker' in navigator)){
+     alert('Este navegador não permite instalar o app. Abra no Chrome ou Edge atualizado.');
+     return;
+   }
+   if(location.protocol!=='https:' && location.hostname!=='localhost' && location.hostname!=='127.0.0.1'){
+     alert('Para instalar e usar offline, publique esta pasta em um endereço HTTPS (por exemplo, GitHub Pages ou Vercel) e abra o site uma vez com internet. Depois use “Instalar app” ou o menu do navegador.');
+   }else{
+     alert('Se a opção de instalação não aparecer automaticamente, use o menu do navegador e escolha “Instalar app” ou “Adicionar à tela inicial”.');
+   }
+ });
+ if('serviceWorker' in navigator && (location.protocol==='https:'||location.hostname==='localhost'||location.hostname==='127.0.0.1')){
+   window.addEventListener('load',()=>{
+     navigator.serviceWorker.register('./sw.js').then(()=>{
+       status.textContent='Modo offline preparado · Abra uma vez com internet para guardar o app';
+     }).catch(()=>{
+       status.textContent='Não foi possível preparar o modo offline neste endereço';
+     });
+   });
+ }
+})();
+</script>
+</body></html>

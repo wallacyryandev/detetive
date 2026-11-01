@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="pt-BR">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta name="theme-color" content="#17120f"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="application-name" content="Arquivo 09"><link rel="apple-touch-icon" href="./icon-192.svg">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta name="theme-color" content="#17120f"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="application-name" content="Arquivo 09"><meta name="apple-mobile-web-app-title" content="Arquivo 09"><link rel="apple-touch-icon" href="./icon-192.png">
 <meta name="description" content="Arquivo 09 — Sala de Investigação, com funcionamento local e modo offline.">
 <link rel="manifest" href="./manifest.webmanifest">
 <title>Arquivo 09 — Sala de Investigação</title>
@@ -256,8 +256,14 @@ button,input,textarea,select{-webkit-tap-highlight-color:transparent}
 const PIN_KEY='arquivo09-pin-sha256';
 async function pinDigest(value){
  const bytes=new TextEncoder().encode(value);
- const digest=await crypto.subtle.digest('SHA-256',bytes);
- return [...new Uint8Array(digest)].map(x=>x.toString(16).padStart(2,'0')).join('');
+ // SHA-256 em HTTPS/localhost; fallback para arquivos locais ou contextos sem Web Crypto.
+ if(globalThis.crypto && crypto.subtle){
+  const digest=await crypto.subtle.digest('SHA-256',bytes);
+  return [...new Uint8Array(digest)].map(x=>x.toString(16).padStart(2,'0')).join('');
+ }
+ let hash=2166136261;
+ for(const byte of bytes){hash^=byte;hash=Math.imul(hash,16777619);}
+ return 'local-'+(hash>>>0).toString(16);
 }
 async function showAccessGate(){
  const gate=$('appGate'),form=$('gateForm'),pin=$('gatePin'),desc=$('gateDescription'),submit=$('gateSubmit'),err=$('gateError');
@@ -769,9 +775,21 @@ document.addEventListener('gesturestart',e=>{if(!e.target.closest('#workspace'))
 /* garante o salvamento se a aba for fechada/escondida logo após uma alteração */
 document.addEventListener('visibilitychange',()=>{if(document.hidden&&state.people.length)save()});
 (async()=>{
- try{state=await load();setPersonFavicon(null);renderHome();await showAccessGate();}
- catch(e){console.error(e);toast('Não foi possível abrir os dados locais.');await showAccessGate();}
- setTimeout(()=>$('splash').classList.add('done'),900);
+ const bootStarted=Date.now();
+ try{
+  state=await load();
+  setPersonFavicon(null);
+  renderHome();
+ }catch(e){
+  console.error('Falha ao iniciar Arquivo 09:',e);
+  toast('Não foi possível abrir os dados locais.');
+ }
+ // Mantém a abertura animada visível por tempo suficiente e só depois mostra a senha.
+ const remaining=Math.max(0,1450-(Date.now()-bootStarted));
+ await new Promise(resolve=>setTimeout(resolve,remaining));
+ $('splash').classList.add('done');
+ await new Promise(resolve=>setTimeout(resolve,420));
+ await showAccessGate();
 })();
 </script> 
 <div id="offlineStatus" role="status" aria-live="polite" class="hidden">Preparando modo offline…</div>
@@ -787,7 +805,8 @@ document.addEventListener('visibilitychange',()=>{if(document.hidden&&state.peop
  onlineState();
  if('serviceWorker' in navigator && (location.protocol==='https:'||location.hostname==='localhost'||location.hostname==='127.0.0.1')){
    window.addEventListener('load',()=>{
-     navigator.serviceWorker.register('./sw.js').then(()=>{
+     navigator.serviceWorker.register('./sw.js?v=2',{updateViaCache:'none'}).then(reg=>{
+       reg.update().catch(()=>{});
        status.textContent='Offline pronto · Abra o app uma vez conectado para armazenar os arquivos';
      }).catch(()=>{
        status.textContent='Não foi possível preparar o modo offline neste endereço';

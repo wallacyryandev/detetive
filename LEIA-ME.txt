@@ -1,12 +1,27 @@
-ARQUIVO 09 — PWA ATUALIZADA
+ARQUIVO 09 — PWA ATUALIZADA (VERSÃO 2)
 
-1. Publique TODOS os arquivos desta pasta na mesma pasta do seu site, em HTTPS.
-2. Abra o endereço uma vez com internet para o Service Worker armazenar a aplicação.
-3. Instale pelo menu do navegador / "Adicionar à tela inicial". A abertura instalada usa modo standalone, sem a barra de endereço do navegador.
-4. Na primeira abertura, crie uma senha com pelo menos 4 caracteres. Nas próximas aberturas, ela será solicitada.
-5. O conteúdo já salvo no aparelho continua disponível sem internet. A sincronização entre aparelhos por PeerJS exige internet.
+O que foi corrigido:
+- Inicialização reorganizada: a animação aparece primeiro e a tela de senha abre logo depois.
+- Cache offline atualizado para v2, removendo caches antigos quando a nova versão é ativada.
+- Manifesto solicita modo fullscreen quando o navegador permite.
+- Ícones PNG 192x192 e 512x512 para maior compatibilidade de instalação.
+- Compatibilidade com senhas já criadas na versão anterior preservada em HTTPS/localhost.
 
-IMPORTANTE:
-- Uma página aberta em uma aba comum não pode esconder à força a barra do navegador. Para ficar com aparência de app, é necessário instalar a PWA ou empacotar o site em APK com modo imersivo.
-- A senha é local neste dispositivo e protege a interface; não substitui autenticação de servidor nem criptografia dos dados.
-- Para trocar ou redefinir a senha, apague a chave "arquivo09-pin-sha256" do armazenamento local do site. Isso não apaga os dados da investigação.
+PUBLICAÇÃO
+1. Envie TODOS os arquivos desta pasta para a mesma pasta do site, mantendo os nomes.
+2. Publique/abra o site por HTTPS. Service Worker e instalação PWA dependem de HTTPS (ou localhost).
+3. Feche a versão antiga. Abra o endereço publicado novamente e faça uma atualização forçada (Ctrl+Shift+R).
+4. Se o app antigo continuar instalado, remova o atalho/app antigo e instale de novo depois de atualizar o site.
+
+INSTALAÇÃO E INTERFACE
+- A barra do navegador só some ao abrir como app instalado. Uma aba comum sempre mantém a interface do navegador.
+- No PC, use Chrome ou Edge para instalar o site como app. O Opera para computador não oferece instalação PWA nativa de forma consistente; o fórum da comunidade Opera confirma a ausência do recurso no desktop.
+- No Android, para uma PWA independente, prefira Chrome. O Opera Android pode apenas criar um atalho na tela inicial que abre o site dentro do navegador.
+- O manifesto pede fullscreen; o navegador/sistema pode aplicar standalone em vez disso, conforme o suporte.
+
+SENHA E DADOS
+- Na primeira abertura depois desta atualização, crie uma senha com pelo menos 4 caracteres.
+- Nas próximas aberturas, a senha será solicitada.
+- Senha e dados são locais por origem/navegador. Ao mudar de file:// para um domínio HTTPS, o navegador trata como armazenamento separado; será necessário configurar a senha novamente e importar backup, se necessário.
+- A senha é uma barreira local da interface, não substitui autenticação de servidor nem criptografia dos dados.
+- O funcionamento offline cobre a estrutura principal e dados locais já armazenados. A sincronização entre dispositivos por PeerJS exige internet.

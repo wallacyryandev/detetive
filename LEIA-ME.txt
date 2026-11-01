@@ -2,7 +2,7 @@ ARQUIVO 09 — PWA ATUALIZADA (VERSÃO 2)
 
 O que foi corrigido:
 - Inicialização reorganizada: a animação aparece primeiro e a tela de senha abre logo depois.
-- Cache offline atualizado para v2, removendo caches antigos quando a nova versão é ativada.
+- Cache offline atualizado para v4, removendo caches antigos quando a nova versão é ativada.
 - Manifesto solicita modo fullscreen quando o navegador permite.
 - Ícones PNG 192x192 e 512x512 para maior compatibilidade de instalação.
 - Compatibilidade com senhas já criadas na versão anterior preservada em HTTPS/localhost.
@@ -25,3 +25,6 @@ SENHA E DADOS
 - Senha e dados são locais por origem/navegador. Ao mudar de file:// para um domínio HTTPS, o navegador trata como armazenamento separado; será necessário configurar a senha novamente e importar backup, se necessário.
 - A senha é uma barreira local da interface, não substitui autenticação de servidor nem criptografia dos dados.
 - O funcionamento offline cobre a estrutura principal e dados locais já armazenados. A sincronização entre dispositivos por PeerJS exige internet.
+
+
+VERSÃO 4 — Tela de abertura redesenhada com identidade visual cinematográfica, fundo animado, emblema 09, moldura e indicador de carregamento.
